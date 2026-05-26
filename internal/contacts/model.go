@@ -1,7 +1,7 @@
 package contacts
 
 type Contact struct {
-	ID      int      `json:"contact_id"`
+	ID      string   `json:"contact_id"`
 	Name    string   `json:"first_name"`
 	Surname string   `json:"last_name"`
 	Company Company  `json:"company"`
@@ -10,7 +10,7 @@ type Contact struct {
 }
 
 type Company struct {
-	ID     int    `json:"company_id"`
+	ID     string `json:"company_id"`
 	Name   string `json:"name"`
 	Addres string `json:"address"`
 }
