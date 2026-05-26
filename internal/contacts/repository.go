@@ -1,5 +1,11 @@
 package contacts
 
+/*
+ok dame una definicion de que es repository asi lo guardo12:51Claude respondió:
+Repository es una capa de abstracción sobre la persistencia.Repository es una capa de abstracción sobre la persistencia.
+Su única responsabilidad es guardar y recuperar datos, sin saber nada de lógica de negocio ni de HTTP.
+*/
+
 import (
 	"errors"
 	"sync"
