@@ -9,6 +9,7 @@ import (
 var (
 	ErrContactAlreadyExists = errors.New("contact already exists")
 	ErrContactNotFound      = errors.New("contact not found")
+	ErrNoContactsFound      = errors.New("no contacts created")
 )
 
 type ContactRepository interface {
@@ -60,11 +61,30 @@ func (repo *InMemoryRepository) Create(c Contact) error {
 }
 
 func (repo *InMemoryRepository) FindByID(id string) (Contact, error) {
-	return Contact{}, nil // change
+	// Aca uso RLock ya que no es exclusivo, solamente queiro leer
+	repo.mu.RLock()
+	defer repo.mu.RUnlock()
+
+	contact, found := repo.contacts[id]
+
+	if !found {
+		return Contact{}, ErrContactNotFound
+	}
+
+	return contact, nil
 }
 
-func (repo *InMemoryRepository) FindAll() ([]Contact, error) {
-	return []Contact{}, nil // change
+func (repo *InMemoryRepository) FindAll() ([]Contact, error) { // por mas que aca no use error, lo dejo asi ya que mas adelante paso a SQL y ahi si necesito error
+	repo.mu.RLock()
+	defer repo.mu.RUnlock()
+
+	result := make([]Contact, 0, len(repo.contacts))
+	// Convierto el map a slice
+	for _, c := range repo.contacts {
+		result = append(result, c)
+	}
+
+	return result, nil // retorno todos
 }
 
 func (repo *InMemoryRepository) Update(c Contact) error {
