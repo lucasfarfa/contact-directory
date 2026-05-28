@@ -1,5 +1,10 @@
 package contacts
 
+import (
+	"errors"
+	"strings"
+)
+
 /*
 El service es la capa de lógica de negocio. Es el intermediario entre el handler y el repository.
 Ni sabe de HTTP ni sabe cómo se guarda la data: solo sabe qué significa operar sobre contactos.
@@ -14,43 +19,59 @@ Ni sabe de HTTP ni sabe cómo se guarda la data: solo sabe qué significa operar
 */
 
 var (
-// defino errores globales
-//TODO
+	ErrContactIdRequired = errors.New("contact id is required")
 )
 
 type ContactService interface {
-	Create(c Contact) error
-	FindByID(id string) (Contact, error)
-	FindAll() []Contact
-	Update(c Contact) error
-	Delete(id string) error
+	CreateContact(c Contact) error
+	ListContact(contactId string) (Contact, error)
+	ListAll() ([]Contact, error)
+	UpdateContact(c Contact) error
+	DeleteContact(contactId string) error
 }
 
-type ContactServiceImp struct {
+type contactService struct { // lo dejo en minuscula asi es privado y dejo solo publica la interfaz
 	repo ContactRepository
 }
 
 func NewContactService(repo ContactRepository) ContactService { // no devuelve pointer porque es una interface
-	return &ContactServiceImp{repo: repo}
+	return &contactService{repo: repo}
 }
 
-func (serv *ContactServiceImp) Create(c Contact) error {
+func (serv *contactService) CreateContact(c Contact) error {
 	return nil
 }
 
-func (serv *ContactServiceImp) FindByID(id string) (Contact, error) {
-	return Contact{}, nil
+func (serv *contactService) ListContact(contactId string) (Contact, error) {
+
+	if strings.TrimSpace(contactId) == "" {
+		return Contact{}, ErrContactIdRequired
+	}
+
+	return serv.repo.FindByID(contactId)
 }
 
-func (serv *ContactServiceImp) FindAll() []Contact {
-	var c []Contact
-	return c
+func (serv *contactService) ListAll() ([]Contact, error) {
+
+	//var contacts []Contact
+	contacts, err := serv.repo.FindAll()
+
+	if err != nil {
+		// implement
+	}
+
+	return contacts, err
 }
 
-func (serv *ContactServiceImp) Update(c Contact) error {
+func (serv *contactService) UpdateContact(c Contact) error {
 	return nil
 }
 
-func (serv *ContactServiceImp) Delete(id string) error {
-	return nil
+func (serv *contactService) DeleteContact(contactId string) error {
+
+	if strings.TrimSpace(contactId) == "" {
+		return ErrContactIdRequired
+	}
+
+	return serv.repo.Delete(contactId)
 }
